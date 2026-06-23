@@ -1,0 +1,53 @@
+J. Fletcher Art — Website Redesign Submission
+
+Live Netlify Project
+https://fletcherart.netlify.app
+
+Submission Overview
+This concept presents a refined, contemporary e-commerce redesign for J. Fletcher Art, built around photographic impact, clean typography, clear product navigation, and a calmer buying journey. The design direction focuses on large editorial imagery, generous spacing, premium art-gallery styling, and direct paths toward product discovery and Add to Cart actions.
+
+The build includes seven homepage directions so the client can choose the strongest visual route while keeping the core shop, product, cart, checkout, about, collections, and journal pages consistent across the theme. This is similar to a premium marketplace/themeforest-style theme structure: multiple homepage concepts, shared commercial templates, and reusable design components.
+
+Key Features Delivered
+- Seven unique homepage concepts.
+- E-commerce friendly product grid and product detail templates.
+- A3, A4, and A5 print size options with uniform pricing.
+- Working shop filters, sorting, page size controls, and pagination.
+- Product detail image slider for multiple product images.
+- Related works section with See All link.
+- Sticky navigation and visual homepage switcher.
+- Cart and checkout template structure ready for payment integration.
+- About, Collections, and Journal pages for richer brand storytelling.
+- Mobile-first responsive layout across desktop, tablet, and mobile.
+- Editable CSS architecture split into main styles and responsive styles.
+
+Homepage and Page Links
+- Primary homepage: https://fletcherart.netlify.app/?home=primary
+- Dark Gallery homepage: https://fletcherart.netlify.app/?home=dark
+- Modernist Grid homepage: https://fletcherart.netlify.app/?home=grid
+- Monochrome Portfolio homepage: https://fletcherart.netlify.app/?home=mono
+- Gallery Magazine homepage: https://fletcherart.netlify.app/?home=magazine
+- Soft Contemporary homepage: https://fletcherart.netlify.app/?home=soft
+- Cinematic Panorama homepage: https://fletcherart.netlify.app/?home=cinematic
+- Shop page: https://fletcherart.netlify.app/shop
+- Collections page: https://fletcherart.netlify.app/collections
+- Product detail page: https://fletcherart.netlify.app/product?id=veil-of-light
+- Cart page: https://fletcherart.netlify.app/cart
+- Checkout page: https://fletcherart.netlify.app/checkout
+- About page: https://fletcherart.netlify.app/about
+- Journal page: https://fletcherart.netlify.app/journal
+
+Design Direction
+The proposed storefront uses a gallery-inspired visual language: large photographic compositions, restrained colours, refined serif headings, simple sans-serif UI text, and clean product cards. The goal is to make the artwork feel premium immediately while keeping the shopping path simple and intuitive.
+
+Sizing and Product Offer
+The product structure follows the simplified client requirement: no paper-option complexity, with uniform pricing across three standard print sizes: A3, A4, and A5.
+
+Development Notes
+The project is coded as a responsive frontend prototype and is ready to deploy on Netlify under the project name “fletcherart”. After deployment, the live URLs above should work using the fletcherart Netlify domain. If Netlify assigns a different domain, replace the base URL in the links while keeping the same paths.
+
+Files Included
+- 00-cover-fletcherart-1920x1080.png
+- Seven homepage mockup images
+- fletcherart-contest-description.pdf
+- fletcherart-contest-description.txt
