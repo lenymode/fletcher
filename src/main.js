@@ -1,5 +1,3 @@
-import "./styles/style.css";
-import "./styles/responsive.css";
 import { homeConfig, homes, images, products } from "./data.js";
 
 const app = document.querySelector("#app");
@@ -31,13 +29,23 @@ const icon = (name) => {
 const currentRoute = () => {
   const path = location.pathname.replace(/\/+$/, "") || "/";
   const params = new URLSearchParams(location.search);
-  return { path, home: params.get("home") || "primary" };
+  const matchedHome = homes.find(home => home.href === `${path === "/" ? "/" : path}`);
+  const legacyHome = params.get("home");
+  return {
+    path,
+    home: matchedHome?.id || legacyHome || document.body.dataset.homePage || "primary"
+  };
 };
+
+const homeHref = theme => homes.find(home => home.id === theme)?.href || "/";
 
 const navigate = (href) => {
   history.pushState({}, "", href);
-  window.scrollTo({ top: 0, behavior: "smooth" });
   render();
+  const hash = new URL(href, location.origin).hash;
+  const target = hash ? document.querySelector(hash) : null;
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  else window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const productGalleryImages = (product) => [
@@ -87,7 +95,7 @@ const filteredProducts = (shop) => {
 const header = (theme = "primary") => `
   <div class="announcement">Complimentary worldwide shipping on orders over $250</div>
   <header class="site-header ${theme === "cinematic" ? "header-overlay" : ""}">
-    <a class="brand" href="/?home=${theme}" data-link>J. FLETCHER ART</a>
+    <a class="brand" href="${homeHref(theme)}" data-link>J. FLETCHER ART</a>
     <button class="mobile-menu" data-menu aria-label="Toggle navigation">${icon("menu")}</button>
     <nav class="nav ${state.menuOpen ? "is-open" : ""}">
       <button class="home-switch-trigger" data-switcher>
@@ -115,7 +123,7 @@ const homeSwitcher = () => `
     </div>
     <div class="switcher-grid">
       ${homes.map(home => `
-        <a href="/?home=${home.id}" data-link class="switcher-card">
+        <a href="${home.href}" data-link class="switcher-card">
           <span class="switcher-preview"><img src="${home.thumb}" alt="${home.title} homepage preview"></span>
           <strong>${home.title}</strong><span>View design ${icon("arrow")}</span>
         </a>
@@ -124,19 +132,31 @@ const homeSwitcher = () => `
   </div>
 `;
 
-const footer = () => `
+const footer = (theme = "primary") => {
+  const footerImages = {
+    primary: images.coast,
+    dark: images.forest,
+    grid: images.architecture,
+    mono: images.architecture2,
+    magazine: images.aerial,
+    soft: images.interior,
+    cinematic: images.mountain2
+  };
+  return `
   <section class="newsletter reveal">
     <div><span class="eyebrow">Private view</span><h2>Stay inspired</h2><p>New prints, stories and exclusive offers delivered thoughtfully.</p></div>
     <form><label class="sr-only" for="email">Email address</label><input id="email" type="email" placeholder="Enter your email address"><button class="button" type="submit">Subscribe</button></form>
   </section>
-  <footer class="footer">
-    <div class="footer-brand"><a class="brand" href="/" data-link>J. FLETCHER ART</a><p>Fine-art photography prints crafted for considered spaces.</p></div>
-    <div><strong>Shop</strong><a href="/shop" data-link>All prints</a><a href="/collections" data-link>Landscapes</a><a href="/collections" data-link>Architecture</a><a href="/collections" data-link>Coastal</a></div>
-    <div><strong>About</strong><a href="/about" data-link>Our story</a><a href="/about" data-link>Materials & quality</a><a href="/about" data-link>Framing guide</a></div>
-    <div><strong>Customer care</strong><a href="/cart" data-link>Shipping & delivery</a><a href="/cart" data-link>Returns & exchanges</a><a href="/cart" data-link>Contact us</a></div>
+  <footer class="footer footer-${theme}" style="--footer-image:url('${footerImages[theme] || footerImages.primary}')">
+    <div class="footer-topline"><span>Fine-art photography</span><span>Worldwide delivery</span></div>
+    <div class="footer-brand"><a class="brand" href="${homeHref(theme)}" data-link>J. FLETCHER<br>ART</a><p>Quiet images, thoughtfully printed for the spaces where life happens.</p></div>
+    <div class="footer-links"><strong>Shop</strong><a href="/shop" data-link>All prints</a><a href="/collections" data-link>Landscapes</a><a href="/collections" data-link>Architecture</a><a href="/collections" data-link>Coastal</a></div>
+    <div class="footer-links"><strong>Studio</strong><a href="/about" data-link>Our story</a><a href="/about" data-link>Materials & quality</a><a href="/journal" data-link>Journal</a></div>
+    <div class="footer-links"><strong>Customer care</strong><a href="${homeHref(theme)}#contact" data-link>Contact us</a><a href="/cart" data-link>Shipping & delivery</a><a href="/cart" data-link>Returns & exchanges</a></div>
     <small>© 2026 J. Fletcher Art. All rights reserved.</small>
   </footer>
 `;
+};
 
 const productCard = (product, index = 0) => `
   <article class="product-card reveal" style="--delay:${index * 70}ms">
@@ -165,24 +185,133 @@ const collectionCard = (name, image, index) => `
   <a href="/collections" data-link class="collection-card reveal" style="--delay:${index * 80}ms">
     <img src="${image}" alt="${name}" loading="lazy">
     <span>${String(index + 1).padStart(2, "0")}</span>
-    <h3>${name}</h3>${icon("arrow")}
+    <h3>${name}</h3><small>Explore</small>${icon("arrow")}
   </a>
 `;
 
 const standardFeatured = (title = "Featured prints", className = "") => `
   <section class="featured section-pad ${className}">
-    <div class="section-heading reveal"><span class="eyebrow">The edit</span><h2>${title}</h2><a href="/shop" class="text-link featured-see-all" data-link>See all ${icon("arrow")}</a>${sizeButtons()}</div>
+    <div class="section-heading reveal"><span class="eyebrow">The edit</span><h2>${title}</h2><a href="/shop" class="text-link featured-see-all" data-link>See All Photographs ${icon("arrow")}</a>${sizeButtons()}</div>
     <div class="product-grid featured-grid">${products.slice(0, 8).map(productCard).join("")}</div>
   </section>
+`;
+
+const heroSlider = (slides, label) => {
+  const loopSlides = [...slides, slides[0]];
+  return `
+    <div class="hero-media hero-slider" aria-label="${label}">
+      <div class="hero-slider-track">
+        ${loopSlides.map((src, index) => `<img src="${src}" alt="${index < slides.length ? `${label}, view ${index + 1}` : ""}" ${index ? 'loading="eager"' : ""}>`).join("")}
+      </div>
+      <div class="hero-slider-progress" aria-label="${label} slide navigation">
+        ${slides.map((_, index) => `
+          <button
+            type="button"
+            class="${index === 0 ? "is-active" : ""}"
+            data-hero-slide="${index}"
+            aria-label="Show image ${index + 1} of ${slides.length}"
+            aria-current="${index === 0 ? "true" : "false"}"
+          ><b>0${index + 1}</b></button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+};
+
+const highlightProduct = (theme) => {
+  const productIndexes = { primary: 0, dark: 4, grid: 1, mono: 3, magazine: 6, soft: 7, cinematic: 5 };
+  const product = products[productIndexes[theme] ?? 0];
+  return `
+    <section class="highlight-product highlight-${theme} section-pad reveal">
+      <div class="highlight-media"><img src="${product.image}" alt="${product.name} featured photograph" loading="lazy"></div>
+      <div class="highlight-copy">
+        <span class="highlight-number">0${(productIndexes[theme] ?? 0) + 1}</span>
+        <span class="eyebrow">${theme === "cinematic" ? "The featured edition" : "Highlight photograph"}</span>
+        <h2>${product.name}</h2>
+        <p class="price">$${product.price}.00</p>
+        <p>A signature fine-art landscape print selected for its quiet atmosphere, tonal depth and easy presence in considered interiors.</p>
+        <dl>
+          <div><dt>Category</dt><dd>${product.category}</dd></div>
+          <div><dt>Sizes</dt><dd>${PRINT_SIZES.join(", ")}</dd></div>
+          <div><dt>Finish</dt><dd>Archival pigment print</dd></div>
+        </dl>
+        <div class="highlight-actions">${sizeButtons("detail-sizes")}<a href="/product?id=${product.id}" class="button" data-link>View details ${icon("arrow")}</a></div>
+      </div>
+    </section>
+  `;
+};
+
+const testimonials = [
+  { quote: "The print has completely changed the atmosphere of our living room. It feels quiet, expansive and beautifully made.", name: "Amelia Hart", place: "London", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&h=750&q=88" },
+  { quote: "The paper and tonal detail are exceptional. Even the packaging felt like opening something truly considered.", name: "Nora Williams", place: "Copenhagen", image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&h=750&q=88" },
+  { quote: "A timeless photograph that gives the room a focal point without ever asking for too much attention.", name: "Sofia Bennett", place: "Melbourne", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&h=750&q=88" }
+];
+
+const testimonialCard = (item, index, theme, duplicate = false) => `
+  <article class="testimonial-card" ${duplicate ? 'aria-hidden="true"' : ""}>
+    <span class="quote-mark">${theme === "mono" ? String((index % testimonials.length) + 1).padStart(2, "0") : "“"}</span>
+    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+    <blockquote>${item.quote}</blockquote>
+    <footer>
+      <img src="${item.image}" alt="${duplicate ? "" : `${item.name}, art collector`}" loading="lazy">
+      <span><strong>${item.name}</strong><small>${item.place}</small></span>
+    </footer>
+  </article>
+`;
+
+const testimonialsSection = (theme) => {
+  const slides = [...testimonials, testimonials[0]];
+  return `
+  <section class="testimonials testimonials-${theme} section-pad reveal" aria-roledescription="carousel">
+    <div class="testimonials-heading"><span class="eyebrow">Collector notes</span><h2>${theme === "grid" ? "ART, AT HOME." : theme === "cinematic" ? "Stories from the walls" : "Loved in considered spaces"}</h2><span class="testimonial-count">03 / 03</span></div>
+    <div class="testimonial-list" aria-live="off">
+      ${slides.map((item, index) => testimonialCard(item, index, theme, index === slides.length - 1)).join("")}
+    </div>
+    <div class="testimonial-progress" aria-hidden="true"><span>01</span><i></i><span>03</span></div>
+  </section>
+`;
+};
+
+const contactSection = (theme) => `
+  <section id="contact" class="contact-section contact-${theme} section-pad reveal">
+    <div class="contact-intro">
+      <span class="eyebrow">Contact us</span>
+      <h2>Need help choosing the right photograph?</h2>
+      <p>Ask about print sizes, styling, delivery or selecting a work for your room. We will help you find a piece that feels right in the space.</p>
+      <a href="mailto:studio@jfletcher.art">studio@jfletcher.art</a>
+    </div>
+    <form class="contact-form">
+      <span class="form-caption">Tell us about your space</span>
+      <div class="form-grid">
+        <input aria-label="Your name" placeholder="Your name">
+        <input aria-label="Email address" type="email" placeholder="Email address">
+        <input class="wide" aria-label="Subject" placeholder="Subject">
+        <textarea aria-label="Message" placeholder="Message"></textarea>
+      </div>
+      <button class="button" type="submit">Send enquiry ${icon("arrow")}</button>
+    </form>
+  </section>
+`;
+
+const homeFinalSections = (theme) => `
+  ${highlightProduct(theme)}
+  ${testimonialsSection(theme)}
+  ${contactSection(theme)}
 `;
 
 const primaryHome = (config) => `
   <section class="hero hero-primary">
     <div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div>
-    <div class="hero-media"><img src="${config.hero}" alt="Mountain landscape fine-art photography"><div class="hero-wash"></div></div>
+    ${heroSlider([config.hero, images.coast2, images.interior], "Considered fine-art photography")}
   </section>
-  <section class="primary-categories">
-    ${[["Landscapes", images.mountain], ["Architecture", images.architecture2], ["Coastal", images.coast2]].map(([name, image], index) => collectionCard(name, image, index)).join("")}
+  <section class="primary-category-section section-pad">
+    <div class="primary-category-heading reveal">
+      <div><span class="eyebrow">Browse by subject</span><h2>Photography for every point of view</h2></div>
+      <a href="/collections" class="text-link" data-link>View all collections ${icon("arrow")}</a>
+    </div>
+    <div class="primary-categories">
+      ${[["Landscapes", images.categoryLandscape], ["Portraits", images.portrait], ["Urban", images.categoryUrban], ["Architecture", images.categoryArchitecture], ["Nature", images.categoryNature], ["Objects", images.categoryObjects]].map(([name, image], index) => collectionCard(name, image, index)).join("")}
+    </div>
   </section>
   ${standardFeatured()}
   <section class="story split-section reveal"><div class="split-media"><img src="${images.interior}" alt="Framed landscape print in an interior" loading="lazy"></div><div class="split-copy"><span class="eyebrow">The story</span><h2>${config.storyTitle}</h2><p>J. Fletcher Art was founded on a love of light, form and place. Each photograph is captured with purpose and printed with meticulous care.</p><a href="/about" class="text-link" data-link>Learn more ${icon("arrow")}</a></div></section>
@@ -191,16 +320,17 @@ const primaryHome = (config) => `
 const darkHome = (config) => `
   <section class="hero hero-dark">
     <div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div>
-    <div class="hero-media"><img src="${config.hero}" alt="Monochrome coastal landscape"><div class="hero-wash"></div></div>
+    ${heroSlider([config.hero, images.coast2, images.architecture2], "Dark gallery photography")}
   </section>
   <section class="dark-collections section-pad">
     <div class="dark-collection-intro reveal"><span class="eyebrow">Collections</span><h2>Explore by<br>collection</h2><a href="/collections" data-link>View all collections ${icon("arrow")}</a></div>
     <div class="dark-collection-mosaic">
-      ${collectionCard("Landscapes", images.mountain, 0)}
+      ${collectionCard("Portrait", images.portrait, 0)}
       ${collectionCard("Architecture", images.architecture2, 1)}
       ${collectionCard("Coastal", images.coast2, 2)}
-      ${collectionCard("Still life", images.paper, 3)}
+      ${collectionCard("Landscape", images.mountain, 3)}
       ${collectionCard("Trees & forests", images.forest, 4)}
+      ${collectionCard("Urban nights", images.urban, 5)}
     </div>
   </section>
   ${standardFeatured()}
@@ -210,11 +340,11 @@ const darkHome = (config) => `
 const gridHome = (config) => `
   <section class="hero hero-grid">
     <div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>Fine art.<br>Clear<br>perspective.</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a><small class="scroll-cue">Scroll ↓</small></div>
-    <div class="hero-media"><img src="${config.hero}" alt="Modern concrete architecture"></div>
+    ${heroSlider([config.hero, images.architecture2, images.aerial], "Modern architectural photography")}
   </section>
   <section class="grid-collections section-pad">
-    <div class="collection-index reveal"><span class="eyebrow">Explore collections</span>${["Landscapes", "Architecture", "Coastal", "Abstract"].map((name, index) => `<a href="/collections" data-link><b>${String(index + 1).padStart(2, "0")}</b><span>${name}</span><i>+</i></a>`).join("")}<a class="view-all" href="/collections" data-link>View all collections ${icon("arrow")}</a></div>
-    <div class="grid-collection-images">${[["Landscapes", images.mountain], ["Architecture", images.architecture2], ["Coastal", images.coast2]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div>
+    <div class="collection-index reveal"><span class="eyebrow">Explore collections</span>${["Urban", "Architecture", "Objects", "Portraits", "Digital art", "Nature"].map((name, index) => `<a href="/collections" data-link><b>${String(index + 1).padStart(2, "0")}</b><span>${name}</span><i>+</i></a>`).join("")}<a class="view-all" href="/collections" data-link>View all collections ${icon("arrow")}</a></div>
+    <div class="grid-collection-images">${[["Urban", images.urban], ["Architecture", images.architecture2], ["Objects", images.objects], ["Portraits", images.portrait], ["Digital art", images.aerial], ["Nature", images.forest]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div>
   </section>
   ${standardFeatured("Selected works", "grid-selected")}
   <section class="story split-section reveal"><div class="split-media"><img src="${images.interior}" alt="Framed architectural print" loading="lazy"></div><div class="split-copy"><span class="eyebrow">Made to last</span><h2>${config.storyTitle}</h2><p>Each photograph is printed using archival inks on museum-grade paper to ensure exceptional detail, stability and longevity.</p><a href="/about" class="text-link" data-link>Learn about our process ${icon("arrow")}</a></div></section>
@@ -222,30 +352,31 @@ const gridHome = (config) => `
 `;
 
 const monoHome = (config) => `
-  <section class="mono-hero">
+  <section class="mono-hero hero-slider-shell">
     <div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div>
-    <div class="mono-collage"><img src="${images.architecture2}" alt="Architectural study"><img src="${images.mountain}" alt="Mountain study"><img src="${images.coast2}" alt="Coastal study"></div>
+    ${heroSlider([images.architecture2, images.mountain, images.coast2], "Monochrome photography studies")}
   </section>
-  <section class="series-strip"><strong>Explore by series</strong>${[["Landscapes", images.mountain], ["Architecture", images.architecture], ["Coastal", images.coast2], ["Minimal", images.aerial], ["Abstract", images.architecture2], ["Ambient", images.forest]].map(([name, image], index) => `<a href="/collections" data-link class="${index === 0 ? "active" : ""}"><img src="${image}" alt=""><span>${name}</span></a>`).join("")}</section>
+  <section class="series-strip"><strong>Explore by series</strong>${[["Portraits", images.portrait], ["Urban", images.urban], ["Objects", images.objects], ["Architecture", images.architecture], ["Coastal", images.coast2], ["Minimal", images.aerial], ["Nature", images.forest], ["Interiors", images.interior]].map(([name, image], index) => `<a href="/collections" data-link class="${index === 0 ? "active" : ""}"><img src="${image}" alt="${name} photography"><span>${name}</span></a>`).join("")}</section>
   ${standardFeatured()}
   <section class="mono-size-section"><div class="frames"><span class="frame frame-a3">A3</span><span class="frame frame-a4">A4</span><span class="frame frame-a5">A5</span></div><div><span class="eyebrow">Size guide</span><h2>Find the perfect fit</h2><p>All prints are available in three carefully considered sizes.</p>${PRINT_SIZES.map(size => `<p class="size-line"><b>${size}</b><span>${size === "A3" ? "29.7 × 42 cm" : size === "A4" ? "21 × 29.7 cm" : "14.8 × 21 cm"}</span></p>`).join("")}</div></section>
   <section class="mono-editorial"><div><span class="eyebrow">The artist</span><h2>${config.storyTitle}</h2><p>Each image is captured with purpose and printed with care.</p></div><img src="${images.mountain2}" alt="Mountain photograph"><div><span class="eyebrow">Material quality</span><h2>Museum-grade materials. Made to last.</h2><p>Archival inks, premium paper and careful hand finishing.</p></div><img src="${images.paper}" alt="Fine art paper"></section>
 `;
 
 const magazineHome = (config) => `
-  <section class="magazine-hero">
+  <section class="magazine-hero hero-slider-shell">
     <div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div>
-    <div class="magazine-images"><img src="${images.architecture2}" alt="Curved architectural staircase"><img src="${images.mountain}" alt="Mountain artwork"><span>Art for<br>considered spaces</span></div>
+    ${heroSlider([images.architecture2, images.mountain, images.interior], "Gallery magazine photography")}
   </section>
-  <section class="magazine-collections section-pad"><div class="magazine-intro reveal"><span class="eyebrow">Collection stories</span><h2>${config.collectionTitle}</h2><a href="/collections" data-link>Explore all collections ${icon("arrow")}</a></div><div class="magazine-card-grid">${[["Wild landscapes", images.mountain], ["Architectural form", images.architecture], ["Coastal elements", images.coast2]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div></section>
+  <section class="magazine-collections section-pad"><div class="magazine-intro reveal"><span class="eyebrow">Collection stories</span><h2>${config.collectionTitle}</h2><a href="/collections" data-link>Explore all collections ${icon("arrow")}</a></div><div class="magazine-card-grid">${[["Portrait stories", images.portrait], ["Urban rhythm", images.urban], ["Objects of form", images.objects], ["Wild landscapes", images.mountain], ["Architectural form", images.architecture], ["Digital horizons", images.aerial]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div></section>
   ${standardFeatured("Exceptional prints, made to last.")}
   <section class="magazine-editorial"><article><span class="eyebrow">From the journal</span><h2>The beauty of restraint</h2><p>On simplicity, negative space and letting the image speak.</p><a href="/journal" data-link>Read the article ${icon("arrow")}</a></article><img src="${images.aerial}" alt="Abstract landscape"><article class="dark-panel"><span class="eyebrow">Styled spaces</span><h2>Art that completes the space</h2><a href="/collections" data-link>Explore styled spaces ${icon("arrow")}</a></article><img src="${images.interior}" alt="Gallery wall"></section>
   <section class="story split-section reveal"><div class="split-media"><img src="${images.paper}" alt="Archival fine art print detail" loading="lazy"></div><div class="split-copy"><span class="eyebrow">Crafted with intention</span><h2>${config.storyTitle}</h2><p>Archival fine art paper, rich pigment inks and expert craftsmanship.</p></div></section>
 `;
 
 const softHome = (config) => `
-  <section class="hero hero-soft"><div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta}</a><div class="hero-benefits"><span>◇ Museum quality</span><span>◎ Worldwide delivery</span><span>♙ Secure checkout</span></div></div><div class="hero-media"><img src="${config.hero}" alt="Soft aerial landscape"></div></section>
+  <section class="hero hero-soft"><div class="hero-copy reveal"><span class="eyebrow">${config.eyebrow}</span><h1>${config.title}</h1><p>${config.copy}</p><a href="/shop" class="button" data-link>${config.cta}</a><div class="hero-benefits"><span>◇ Museum quality</span><span>◎ Worldwide delivery</span><span>♙ Secure checkout</span></div></div>${heroSlider([config.hero, images.coast, images.interior], "Soft contemporary photography")}</section>
   <section class="filter-bar"><div><span>Filter by colour</span><i style="--c:#b3a48d"></i><i style="--c:#718077"></i><i style="--c:#5c7380"></i><i style="--c:#c9c8c5"></i><i style="--c:#343638"></i><i style="--c:#aa6f55"></i></div><div><span>Filter by subject</span><button>Landscapes</button><button>Coastal</button><button>Mountains</button><button>Architecture</button><button>Abstract</button></div></section>
+  <section class="soft-categories section-pad"><div class="soft-category-heading"><span class="eyebrow">Browse by subject</span><h2>Find the mood for your space</h2><a href="/collections" data-link>All collections ${icon("arrow")}</a></div><div class="soft-category-mosaic">${[["Portraits", images.portrait], ["Objects", images.objects], ["Nature", images.forest], ["Architecture", images.architecture2], ["Abstract", images.aerial], ["Interiors", images.interior]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div></section>
   ${standardFeatured()}
   <section class="soft-inspiration split-section reveal"><div class="split-copy"><span class="eyebrow">Inspiration</span><h2>${config.collectionTitle}</h2><p>Prints designed to work beautifully alone or together.</p><a href="/collections" class="button" data-link>Explore collections</a></div><div class="split-media"><img src="${images.interior}" alt="Curated gallery wall"></div></section>
   <section class="choose-steps"><span class="eyebrow">How to choose</span><h2>Find the perfect print in three simple steps</h2><div>${["Choose your print", "Choose your size", "Style your space"].map((name, index) => `<article><b>${index + 1}</b><strong>${name}</strong><p>${index === 1 ? "Select A3, A4 or A5 — all prints share one uniform price." : "A simple, considered path to art that belongs in your space."}</p></article>`).join("")}</div></section>
@@ -253,8 +384,8 @@ const softHome = (config) => `
 `;
 
 const cinematicHome = (config) => `
-  <section class="hero hero-cinematic"><div class="hero-copy reveal"><h1>${config.title}</h1><span class="cinematic-subtitle">${config.eyebrow}</span><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div><div class="hero-media"><img src="${config.hero}" alt="Cinematic mountain panorama"></div></section>
-  <section class="cinematic-collections section-pad"><div class="cinematic-rule"><span>Explore our collections</span></div><div class="collection-grid">${[["Wild landscapes", images.mountain], ["Architectural form", images.architecture], ["Coastal stories", images.coast2], ["Nature studies", images.forest]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div></section>
+  <section class="hero hero-cinematic"><div class="hero-copy reveal"><h1>${config.title}</h1><span class="cinematic-subtitle">${config.eyebrow}</span><a href="/shop" class="button" data-link>${config.cta} ${icon("arrow")}</a></div>${heroSlider([config.hero, images.desert, images.coast2], "Cinematic landscape photography")}</section>
+  <section class="cinematic-collections section-pad"><div class="cinematic-rule"><span>Explore our collections</span></div><div class="collection-grid">${[["Wild landscapes", images.mountain], ["Architectural form", images.architecture], ["Coastal stories", images.coast2], ["Nature studies", images.forest], ["Desert light", images.desert], ["Abstract terrain", images.aerial]].map(([name, image], index) => collectionCard(name, image, index)).join("")}</div></section>
   ${standardFeatured()}
   <section class="limited-feature"><img src="${images.mountain}" alt="Summit Light limited edition"><div><span class="eyebrow">Limited edition</span><h2>Summit Light</h2><strong>$89.00</strong><p>A fleeting moment above the clouds, captured in the Italian Alps.</p>${sizeButtons("detail-sizes")}<button class="button add-cart" data-add="veil-of-light">Add to cart</button></div><ul><li>Museum quality</li><li>Limited editions</li><li>Made to order</li></ul></section>
   <section class="cinematic-size"><div><span class="eyebrow">Find your perfect fit</span><h2>See it. Love it. Live with it.</h2><a href="/product?id=veil-of-light" data-link>View size guide ${icon("arrow")}</a></div><div class="frames"><span class="frame frame-a3">A3</span><span class="frame frame-a4">A4</span><span class="frame frame-a5">A5</span></div></section>
@@ -271,8 +402,9 @@ const homePage = (id) => {
       <main>
         ${layout(config)}
         ${trust()}
+        ${homeFinalSections(config.theme)}
       </main>
-      ${footer()}
+      ${footer(config.theme)}
     </div>`;
 };
 
@@ -517,6 +649,20 @@ const observeReveals = () => {
 document.addEventListener("click", event => {
   const link = event.target.closest("[data-link]");
   if (link) { event.preventDefault(); navigate(link.getAttribute("href")); return; }
+  const heroSlideButton = event.target.closest("[data-hero-slide]");
+  if (heroSlideButton) {
+    const slider = heroSlideButton.closest(".hero-slider");
+    const slideIndex = Number(heroSlideButton.dataset.heroSlide);
+    if (!slider || !Number.isInteger(slideIndex)) return;
+    slider.classList.add("is-manual");
+    slider.style.setProperty("--hero-slide", slideIndex);
+    slider.querySelectorAll("[data-hero-slide]").forEach(button => {
+      const isActive = button === heroSlideButton;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-current", String(isActive));
+    });
+    return;
+  }
   const shopPageButton = event.target.closest("[data-shop-page]");
   if (shopPageButton) { updateShop({ page: Number(shopPageButton.dataset.shopPage) }); return; }
   if (event.target.closest("[data-shop-reset]")) { navigate("/shop"); return; }

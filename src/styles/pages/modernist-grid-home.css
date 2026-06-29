@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Modernist Grid homepage belong here. */
+body[data-home-page="grid"] {
+  --homepage-entry: modernist-grid;
+}

@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Considered Spaces homepage belong here. */
+body[data-home-page="primary"] {
+  --homepage-entry: considered-spaces;
+}

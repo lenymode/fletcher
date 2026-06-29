@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Soft Contemporary homepage belong here. */
+body[data-home-page="soft"] {
+  --homepage-entry: soft-contemporary;
+}

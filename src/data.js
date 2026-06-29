@@ -9,7 +9,15 @@ export const images = {
   desert: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1600&q=86",
   aerial: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1800&q=86",
   interior: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=86",
-  paper: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=1400&q=84"
+  paper: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=1400&q=84",
+  portrait: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&h=1500&q=88",
+  urban: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1800&q=86",
+  objects: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1400&q=86",
+  categoryLandscape: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=88",
+  categoryUrban: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=1600&q=88",
+  categoryArchitecture: "https://images.unsplash.com/photo-1431576901776-e539bd916ba2?auto=format&fit=crop&w=1400&q=88",
+  categoryNature: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1400&q=88",
+  categoryObjects: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1400&q=88"
 };
 
 export const products = [
@@ -24,13 +32,13 @@ export const products = [
 ];
 
 export const homes = [
-  { id: "primary", title: "Considered Spaces", thumb: "/mockups/j-fletcher-art-homepage-concept.png" },
-  { id: "dark", title: "Dark Gallery", thumb: "/mockups/j-fletcher-art-02-dark-gallery.png" },
-  { id: "grid", title: "Modernist Grid", thumb: "/mockups/j-fletcher-art-04-modernist-grid.png" },
-  { id: "mono", title: "Monochrome Portfolio", thumb: "/mockups/j-fletcher-art-06-monochrome-portfolio.png" },
-  { id: "magazine", title: "Gallery Magazine", thumb: "/mockups/j-fletcher-art-08-gallery-magazine.png" },
-  { id: "soft", title: "Soft Contemporary", thumb: "/mockups/j-fletcher-art-09-soft-contemporary.png" },
-  { id: "cinematic", title: "Cinematic Panorama", thumb: "/mockups/j-fletcher-art-10-cinematic-panorama.png" }
+  { id: "primary", title: "Considered Spaces", href: "/", thumb: "/mockups/j-fletcher-art-homepage-concept.png" },
+  { id: "dark", title: "Dark Gallery", href: "/dark-gallery-home.html", thumb: "/mockups/j-fletcher-art-02-dark-gallery.png" },
+  { id: "grid", title: "Modernist Grid", href: "/modernist-grid-home.html", thumb: "/mockups/j-fletcher-art-04-modernist-grid.png" },
+  { id: "mono", title: "Monochrome Portfolio", href: "/monochrome-portfolio-home.html", thumb: "/mockups/j-fletcher-art-06-monochrome-portfolio.png" },
+  { id: "magazine", title: "Gallery Magazine", href: "/gallery-magazine-home.html", thumb: "/mockups/j-fletcher-art-08-gallery-magazine.png" },
+  { id: "soft", title: "Soft Contemporary", href: "/soft-contemporary-home.html", thumb: "/mockups/j-fletcher-art-09-soft-contemporary.png" },
+  { id: "cinematic", title: "Cinematic Panorama", href: "/cinematic-panorama-home.html", thumb: "/mockups/j-fletcher-art-10-cinematic-panorama.png" }
 ];
 
 export const homeConfig = {
@@ -49,7 +57,7 @@ export const homeConfig = {
     title: "Art shaped by light and place",
     copy: "Fine-art photographic prints, crafted with purpose and printed to last a lifetime.",
     cta: "Explore the prints",
-    hero: images.coast2,
+    hero: images.forest,
     theme: "dark",
     collectionTitle: "Explore by collection",
     storyTitle: "Intentional imagery. Timeless expression."

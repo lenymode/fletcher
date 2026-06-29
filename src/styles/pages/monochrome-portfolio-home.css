@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Monochrome Portfolio homepage belong here. */
+body[data-home-page="mono"] {
+  --homepage-entry: monochrome-portfolio;
+}

@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Dark Gallery homepage belong here. */
+body[data-home-page="dark"] {
+  --homepage-entry: dark-gallery;
+}

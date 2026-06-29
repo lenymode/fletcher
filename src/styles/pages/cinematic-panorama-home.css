@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Cinematic Panorama homepage belong here. */
+body[data-home-page="cinematic"] {
+  --homepage-entry: cinematic-panorama;
+}

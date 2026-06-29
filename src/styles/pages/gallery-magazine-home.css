@@ -1,0 +1,7 @@
+@import "../style.css";
+@import "../responsive.css";
+
+/* Page-specific additions for the Gallery Magazine homepage belong here. */
+body[data-home-page="magazine"] {
+  --homepage-entry: gallery-magazine;
+}
